@@ -1,0 +1,4 @@
+pandas~=1.2.3
+numpy~=1.19.5
+torch~=1.8.0+cu111
+tqdm~=4.59.0
