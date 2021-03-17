@@ -1,6 +1,7 @@
 from utils.resnet import ResNet
 from utils.dataTool import train_val_test_loader, plotTrainValLoss
 from utils.trainer import train_test_model
+from utils.baseline import testLastSameDayRegression
 from config import Config
 import torch
 
@@ -12,6 +13,7 @@ train_loader, val_loader, test_loader = train_val_test_loader(config)
 # 定义网络，训练并测试
 net = ResNet(config).to(config.device)
 train_test_model(net, train_loader, val_loader, test_loader, config)
+testLastSameDayRegression(test_loader, config.device)
 plotTrainValLoss()
 
 

@@ -101,7 +101,7 @@ def plotTrainValLoss():
     concat_losses = np.concatenate([train_losses[:, np.newaxis], val_losses[:, np.newaxis]], axis=1)
     pd.DataFrame(data=concat_losses, columns=['Train Loss', 'Val Loss']).plot(
         logy=True, figsize=(10, 6), xlabel='Batch', ylabel='Loss')
-    plt.savefig('result/train_val_loss_decrease.jpg', dpi=150, bbox_inches='tight')
+    plt.savefig('results/train_val_loss_decrease.jpg', dpi=150, bbox_inches='tight')
 
 
 def loadModel(config):

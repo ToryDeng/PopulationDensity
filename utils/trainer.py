@@ -1,4 +1,4 @@
-from utils.EarlyStopping import EarlyStopping
+from utils.earlyStopping import EarlyStopping
 from datetime import datetime
 import torch
 import numpy as np
@@ -48,7 +48,7 @@ def train_test_model(net, train_data, val_data, test_data, config):
             break
     test_loss = evaluate(net, test_data, device)
     end_time = datetime.now()
-    print("Test Loss:{:.5f} | Total Running Time: {}".format(test_loss, end_time - start_time))
+    print("Test Loss:{:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
     np.save('results/train_losses.npy', np.array(train_losses))
     np.save('results/val_losses.npy', np.array(val_losses))
 
