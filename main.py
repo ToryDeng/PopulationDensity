@@ -1,7 +1,7 @@
 from utils.resnet import ResNet
 from utils.dataTool import train_val_test_loader, plotTrainValLoss
-from utils.trainer import train_test_model
-from utils.baseline import testLastSameDayRegression
+from utils.trainer import train_test_model, evaluate
+from utils.baseline import testLastHourRegression
 from config import Config
 import torch
 
@@ -13,15 +13,10 @@ train_loader, val_loader, test_loader = train_val_test_loader(config)
 # 定义网络，训练并测试
 net = ResNet(config).to(config.device)
 train_test_model(net, train_loader, val_loader, test_loader, config)
-testLastSameDayRegression(test_loader, config.device)
 plotTrainValLoss()
+# 测试baseline
+testLastHourRegression(test_loader, config.device, config.metric, hour_type='last_day')
+testLastHourRegression(test_loader, config.device, config.metric, hour_type='last_week')
 
 
 
-
-
-# recent = torch.randn(size=(32, config.recent_len, 52, 77))
-# period = torch.randn(size=(32, config.period_len, 52, 77))
-# trend = torch.randn(size=(32, config.trend_len, 52, 77))
-# meta = torch.randn(size=(32, config.ext_dim,))
-# print(net(recent, period, trend, meta).shape)

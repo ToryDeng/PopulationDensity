@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+from datetime import datetime
 from utils.resnet import ResNet
 from utils.myDataset import MyDataset
 from torch.utils.data import DataLoader
@@ -25,11 +26,14 @@ def loadTimeFeature():
     time_data['日期'] = pd.to_datetime(time_data['日期'])
     time_data['周几'] = time_data['日期'].map(lambda x: x.weekday())
     time_data['是否工作日'] = time_data['周几'].map(lambda x: 1 if x not in [6, 7] else 0)
-    time_feature = np.zeros(shape=(time_data.shape[0] * 24, 9))
+    time_data['是否一级响应'] = time_data['日期'].map(lambda x: 1 if x >= datetime(year=2020, month=1, day=24) else 0)
+
+    time_feature = np.zeros(shape=(time_data.shape[0] * 24, 10))
     for i in range(time_data.shape[0]):
         time_feature[i * 24:(i + 1) * 24, time_data.iloc[i, 2]] = 1
         time_feature[i * 24:(i + 1) * 24, 7] = time_data.iloc[i, 3]
         time_feature[i * 24:(i + 1) * 24, 8] = time_data.iloc[i, 1]
+        time_feature[i * 24:(i + 1) * 24, 9] = time_data.iloc[i, 4]
     return time_feature
 
 
@@ -46,6 +50,7 @@ def integrateMetaData():
     time_feature, weather_feature, migration_feature = loadTimeFeature(), loadWeatherFeature(), loadMigrationIndex()
     integrated_data = np.concatenate([time_feature, weather_feature, migration_feature], axis=1)
     np.save('data/meta_data.npy', integrated_data)
+    print('数据保存完成！')
 
 
 def convertDataToFlow():
@@ -86,11 +91,12 @@ def train_val_test_loader(config):
     myTrainDataset = MyDataset(config=config, data_type='train')
     train_loader = DataLoader(dataset=myTrainDataset, batch_size=config.batch_size, shuffle=False)
 
-    myValDataset = MyDataset(config=config, data_type='val')
-    val_loader = DataLoader(dataset=myValDataset, batch_size=config.batch_size, shuffle=False)
+    myValDataset = MyDataset(config=config, data_type='val')  # 一次读入
+    val_loader = DataLoader(dataset=myValDataset, batch_size=myValDataset.val_len, shuffle=False)
 
-    myTestDataset = MyDataset(config=config, data_type='test')
-    test_loader = DataLoader(dataset=myTestDataset, batch_size=config.batch_size, shuffle=False)
+    myTestDataset = MyDataset(config=config, data_type='test')  # 一次读入
+    test_loader = DataLoader(dataset=myTestDataset, batch_size=myTestDataset.test_len, shuffle=False)
+
     return train_loader, val_loader, test_loader
 
 
@@ -98,6 +104,7 @@ def plotTrainValLoss():
     plt.style.use("ggplot")
     train_losses = np.load('results/train_losses.npy', allow_pickle=True)
     val_losses = np.load('results/val_losses.npy', allow_pickle=True)
+    print(train_losses)
     concat_losses = np.concatenate([train_losses[:, np.newaxis], val_losses[:, np.newaxis]], axis=1)
     pd.DataFrame(data=concat_losses, columns=['Train Loss', 'Val Loss']).plot(
         logy=True, figsize=(10, 6), xlabel='Batch', ylabel='Loss')
@@ -108,5 +115,3 @@ def loadModel(config):
     net = ResNet(config)
     net.load_state_dict(torch.load('results/checkpoint.pt'))
     return net
-
-

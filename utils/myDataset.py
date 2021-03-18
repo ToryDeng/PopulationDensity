@@ -13,7 +13,10 @@ class MyDataset(Dataset):
         self.meta = np.load('data/meta_data.npy')
         self.min = self.flow.min()
         self.max = self.flow.max()
+        self.mean = self.flow.mean()
+        self.std = self.flow.std()
         self.flow = (self.flow - self.min) / (self.max - self.min)  # min-max
+        # self.flow = (self.flow - self.mean) / self.std
         self.recent_len = config.recent_len
         self.period_len = config.period_len
         self.trend_len = config.trend_len
