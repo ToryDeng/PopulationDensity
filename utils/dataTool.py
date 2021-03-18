@@ -104,7 +104,6 @@ def plotTrainValLoss():
     plt.style.use("ggplot")
     train_losses = np.load('results/train_losses.npy', allow_pickle=True)
     val_losses = np.load('results/val_losses.npy', allow_pickle=True)
-    print(train_losses)
     concat_losses = np.concatenate([train_losses[:, np.newaxis], val_losses[:, np.newaxis]], axis=1)
     pd.DataFrame(data=concat_losses, columns=['Train Loss', 'Val Loss']).plot(
         logy=True, figsize=(10, 6), xlabel='Batch', ylabel='Loss')
