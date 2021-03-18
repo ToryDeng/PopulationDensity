@@ -50,6 +50,7 @@ def train_test_model(net, train_data, val_data, test_data, config):
     test_loss = evaluate(net, test_data, device, metric)
     end_time = datetime.now()
     print("Test Loss:{:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
+    torch.save(net, 'results/DeepST-ResNet.pkl')
     np.save('results/train_losses.npy', np.array(train_losses))
     np.save('results/val_losses.npy', np.array(val_losses))
 
