@@ -1,10 +1,11 @@
 from utils.earlyStopping import EarlyStopping
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from datetime import datetime
 import torch
 import numpy as np
 
 
-def train_test_model(net, train_data, val_data, test_data, config):
+def train_test_model(net, train_data, val_data, config):
     """
     训练并测试网络，最后保存训练损失与验证损失
 
@@ -22,6 +23,7 @@ def train_test_model(net, train_data, val_data, test_data, config):
     metric = config.metric
     device = config.device
     optimizer = config.optimizer(net.parameters(), lr=config.learning_rate)
+    scheduler = CosineAnnealingLR(optimizer=optimizer, T_max=30, eta_min=0)
 
     for epoch in range(config.epochs):
         net.train()
@@ -35,11 +37,13 @@ def train_test_model(net, train_data, val_data, test_data, config):
             train_loss.backward()
             optimizer.step()
 
+
             val_loss = evaluate(net, val_data, device, metric)
             val_losses.append(val_loss.item())
             print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f} | Val Loss: {:.5f}".format(
                 epoch + 1, i + 1, train_loss, val_loss
             ))
+        scheduler.step()
         #     early_stopping(val_loss, net)
         #     if early_stopping.early_stop:
         #         print("Early stopping")
@@ -47,9 +51,9 @@ def train_test_model(net, train_data, val_data, test_data, config):
         #         break
         # if early_stopping.early_stop:
         #     break
-    test_loss = evaluate(net, test_data, device, metric)
+    # test_loss = evaluate(net, test_data, device, metric)
     end_time = datetime.now()
-    print("Test Loss:{:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
+    print("Total Running Time: {}".format(end_time - start_time))
     torch.save(net, 'results/DeepST-ResNet.pkl')
     np.save('results/train_losses.npy', np.array(train_losses))
     np.save('results/val_losses.npy', np.array(val_losses))

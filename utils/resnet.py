@@ -45,13 +45,11 @@ class ResPath(nn.Module):
         super(ResPath, self).__init__()
         self.unit = nn.Sequential(
             nn.Conv2d(in_flow, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
-            nn.BatchNorm2d(64),
             ResUnit(), ResUnit(), ResUnit(), ResUnit(),
             ResUnit(), ResUnit(), ResUnit(), ResUnit(),
-            ResUnit(), ResUnit(), ResUnit(), ResUnit(),
+
             nn.ReLU(inplace=True),
             nn.Conv2d(64, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
-            nn.BatchNorm2d(out_flow)
         )
 
     def forward(self, x):
@@ -64,7 +62,6 @@ class ResUnit(nn.Module):
         self.left = nn.Sequential(
             nn.ReLU(inplace=True),
             nn.Conv2d(in_flow, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
-            nn.BatchNorm2d(out_flow)
         )
 
     def forward(self, x):

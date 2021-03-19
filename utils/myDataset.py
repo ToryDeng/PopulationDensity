@@ -26,16 +26,16 @@ class MyDataset(Dataset):
         self.data_type = data_type
         self.sample_num = self.flow.shape[0] - self.week * self.trend_len
         self.train_len = int(self.sample_num * config.train_size)
-        self.val_len = int(self.sample_num * config.val_size)
-        self.test_len = self.sample_num - self.train_len - self.val_len
+        self.val_len = self.sample_num - self.train_len
+        # self.test_len = self.sample_num - self.train_len - self.val_len
 
     def __len__(self):
         if self.data_type == 'train':
             return self.train_len
         elif self.data_type == 'val':
             return self.val_len
-        elif self.data_type == 'test':
-            return self.test_len
+        # elif self.data_type == 'test':
+        #     return self.test_len
         else:
             print('ERROR!')
             return None
@@ -45,8 +45,8 @@ class MyDataset(Dataset):
             y_idx = self.week * self.trend_len + index
         elif self.data_type == 'val':
             y_idx = self.week * self.trend_len + self.train_len + index
-        elif self.data_type == 'test':
-            y_idx = self.week * self.trend_len + self.train_len + self.val_len + index
+        # elif self.data_type == 'test':
+        #     y_idx = self.week * self.trend_len + self.train_len + self.val_len + index
         else:
             print('ERROR!')
             return None
