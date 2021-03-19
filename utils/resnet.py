@@ -24,7 +24,8 @@ class ResNet(nn.Module):
         self.w3 = nn.Parameter(self._weightInit(config.init_method))
 
     def forward(self, X):
-        recent_data, period_data, trend_data, feature_data = X[0].to(self.device), X[1].to(self.device), X[2].to(self.device), X[3].to(self.device),
+        recent_data, period_data, trend_data, feature_data = X[0].to(self.device), X[1].to(self.device), X[2].to(
+            self.device), X[3].to(self.device),
         recent_out = self.recent(recent_data).view(-1, self.y, self.x)
         period_out = self.period(period_data).view(-1, self.y, self.x)
         trend_out = self.trend(trend_data).view(-1, self.y, self.x)
@@ -43,11 +44,15 @@ class ResPath(nn.Module):
     def __init__(self, in_flow, out_flow):
         super(ResPath, self).__init__()
         self.unit = nn.Sequential(
-            nn.Conv2d(in_flow, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),
-            ResUnit(),
-            ResUnit(),
+            nn.Conv2d(in_flow, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
+            nn.BatchNorm2d(64),
+            ResUnit(), ResUnit(), ResUnit(), ResUnit(),
+            ResUnit(), ResUnit(), ResUnit(), ResUnit(),
+            ResUnit(), ResUnit(), ResUnit(), ResUnit(),
             nn.ReLU(inplace=True),
-            nn.Conv2d(64, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False))
+            nn.Conv2d(64, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
+            nn.BatchNorm2d(out_flow)
+        )
 
     def forward(self, x):
         return self.unit(x)
@@ -58,7 +63,8 @@ class ResUnit(nn.Module):
         super(ResUnit, self).__init__()
         self.left = nn.Sequential(
             nn.ReLU(inplace=True),
-            nn.Conv2d(in_flow, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+            nn.Conv2d(in_flow, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
+            nn.BatchNorm2d(out_flow)
         )
 
     def forward(self, x):
