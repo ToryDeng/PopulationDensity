@@ -9,15 +9,38 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 
+def convertGridStrength():
+    grid_strength = pd.read_csv('data/datafountain_competition_od.txt', delimiter='\t', header=None)
+    grid_strength.columns = ['hour', 'start_grid_x', 'start_grid_y', 'end_grid_x', 'end_grid_y', 'index']
+    for col in ['start_grid_x', 'start_grid_y', 'end_grid_x', 'end_grid_y']:
+        grid_strength[col] = np.around(grid_strength[col].values, 2)
+    x = np.sort(np.unique(grid_strength['start_grid_x']))
+    y = np.sort(np.unique(grid_strength['start_grid_y']))
+    grid_strength_flow = np.zeros((2, 24, x.shape[0], y.shape[0]))
+    for i in tqdm(range(grid_strength.shape[0])):
+        start_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 1]))[0], np.argwhere(np.isin(y, grid_strength.iloc[i, 2]))[0]])
+        end_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 3]))[0], np.argwhere(np.isin(y, grid_strength.iloc[i, 4]))[0]])
+        # start离开-end到达
+        grid_strength_flow[0, grid_strength.iloc[i, 0], start_idx[0], start_idx[1]] += grid_strength.iloc[i, 5]
+        grid_strength_flow[1, grid_strength.iloc[i, 0], end_idx[0], end_idx[1]] += grid_strength.iloc[i, 5]
+    np.save('data/grid_strength_flow.npy', grid_strength_flow[0] - grid_strength_flow[1])
+
+
+def loadGridStrength():
+    strength = np.load('data/grid_strength_flow.npy').swapaxes(1, 2)
+    strength = (strength - strength.min()) / (strength.max() - strength.min())
+    np.save('data/norm_strength_flow.npy', strength)
+
 def loadMigrationIndex():
     migra_data = pd.read_csv('data/migration_index.csv', header=None)
     migra_data.columns = ['日期', '出发省份', '出发城市', '到达省份', '到达城市', '迁徙指数']
-    beijing_data = migra_data[migra_data['到达省份'] == '北京市'].drop(columns=['出发省份', '出发城市', '到达省份', '到达城市'])
-    sum_by_day = beijing_data.groupby(by='日期').sum()
+    from_beijing_data = migra_data[migra_data['出发省份'] == '北京市']
+    to_beijing_data = migra_data[migra_data['到达省份'] == '北京市']
+    sum_by_day = from_beijing_data.groupby(by='日期')['迁徙指数'].sum() - to_beijing_data.groupby(by='日期')['迁徙指数'].sum()
     norm_sum = (sum_by_day - sum_by_day.min()) / (sum_by_day.max() - sum_by_day.min())
     migration_feature = np.zeros(shape=(norm_sum.shape[0] * 24, 1))
     for i in range(norm_sum.shape[0]):
-        migration_feature[i * 24:(i + 1) * 24, 0] = norm_sum.iloc[i, 0]
+        migration_feature[i * 24:(i + 1) * 24, 0] = norm_sum.iloc[i]
     return migration_feature
 
 
@@ -26,14 +49,12 @@ def loadTimeFeature():
     time_data['日期'] = pd.to_datetime(time_data['日期'])
     time_data['周几'] = time_data['日期'].map(lambda x: x.weekday())
     time_data['是否工作日'] = time_data['周几'].map(lambda x: 1 if x not in [6, 7] else 0)
-    time_data['是否一级响应'] = time_data['日期'].map(lambda x: 1 if x >= datetime(year=2020, month=1, day=24) else 0)
 
-    time_feature = np.zeros(shape=(time_data.shape[0] * 24, 10))
+    time_feature = np.zeros(shape=(time_data.shape[0] * 24, 9))
     for i in range(time_data.shape[0]):
         time_feature[i * 24:(i + 1) * 24, time_data.iloc[i, 2]] = 1
         time_feature[i * 24:(i + 1) * 24, 7] = time_data.iloc[i, 3]
         time_feature[i * 24:(i + 1) * 24, 8] = time_data.iloc[i, 1]
-        time_feature[i * 24:(i + 1) * 24, 9] = time_data.iloc[i, 4]
     return time_feature
 
 

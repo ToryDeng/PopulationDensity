@@ -11,11 +11,13 @@ class MyDataset(Dataset):
     def __init__(self, config, data_type='train'):
         self.flow = np.load('data/grid_graph_flow.npy')
         self.meta = np.load('data/meta_data.npy')
+        self.strength = np.load('data/norm_strength_flow.npy')
         self.min = self.flow.min()
         self.max = self.flow.max()
         self.mean = self.flow.mean()
         self.std = self.flow.std()
         self.flow = (self.flow - self.min) / (self.max - self.min)  # min-max
+
         # self.flow = (self.flow - self.mean) / self.std
         self.recent_len = config.recent_len
         self.period_len = config.period_len
@@ -53,11 +55,13 @@ class MyDataset(Dataset):
         recent_list, period_list, trend_list = [], [], []
         y = torch.from_numpy(self.flow[y_idx])
         y_meta = torch.from_numpy(self.meta[y_idx])
+        y_strength = torch.from_numpy((self.strength[y_idx % 24]))
         for i in range(self.recent_len):
             recent_list.append(self.flow[y_idx - (i + 1)])
         for j in range(self.period_len):
             period_list.append(self.flow[y_idx - (j + 1) * self.day])
         for k in range(self.trend_len):
             trend_list.append(self.flow[y_idx - (k + 1) * self.week])
-        x = [toTensor(recent_list), toTensor(period_list), toTensor(trend_list), toTensor(y_meta)]
+        x = [toTensor(recent_list), toTensor(period_list), toTensor(trend_list),
+             toTensor(y_meta), toTensor(y_strength)]
         return x, y

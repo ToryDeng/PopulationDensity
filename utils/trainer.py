@@ -46,12 +46,12 @@ def train_test_model(net, train_data, val_data, config):
         scheduler.step()
         test_loss = evaluate(net, val_data, device, metric)
         early_stopping(test_loss, net)
+        end_time = datetime.now()
+        print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
         if early_stopping.early_stop:
             print("Early stopping")
             # 结束模型训练
             break
-        end_time = datetime.now()
-        print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
     torch.save(net, 'results/DeepST-ResNet.pkl')
     np.save('results/train_losses.npy', np.array(train_losses))
     np.save('results/val_losses.npy', np.array(val_losses))

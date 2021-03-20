@@ -23,17 +23,19 @@ class ResNet(nn.Module):
         self.w1 = nn.Parameter(self._weightInit(config.init_method))
         self.w2 = nn.Parameter(self._weightInit(config.init_method))
         self.w3 = nn.Parameter(self._weightInit(config.init_method))
+        self.w4 = nn.Parameter(self._weightInit(config.init_method))
 
     def forward(self, X):
-        recent_data, period_data, trend_data, feature_data = X[0].to(self.device), X[1].to(self.device), X[2].to(
-            self.device), X[3].to(self.device),
+        recent_data, period_data, trend_data, feature_data, strength_data = \
+            X[0].to(self.device), X[1].to(self.device), X[2].to(self.device), X[3].to(self.device), X[4].to(self.device)
         recent_out = self.recent(recent_data).view(-1, self.y, self.x)
         period_out = self.period(period_data).view(-1, self.y, self.x)
         trend_out = self.trend(trend_data).view(-1, self.y, self.x)
         ext_out = self.ext(feature_data)
         ext_out = ext_out.view(-1, self.y, self.x)
         main_out = F.gelu(
-            torch.mul(recent_out, self.w1) + torch.mul(period_out, self.w2) + torch.mul(trend_out, self.w3) + ext_out
+            torch.mul(recent_out, self.w1) + torch.mul(period_out, self.w2) +
+            torch.mul(trend_out, self.w3) + torch.mul(strength_data, self.w4) + ext_out
         )
         return main_out
 

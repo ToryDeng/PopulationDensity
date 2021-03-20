@@ -27,7 +27,7 @@ class Config:
         self.batch_size = 32
         self.num_linear_units = 10
         self.init_method = kaiming_normal_
-        self.ext_dim = 14
+        self.ext_dim = 13
         self.learning_rate = 1e-3
         self.loss_func = MSELoss()
         self.metric = MSELoss(reduction='sum')
