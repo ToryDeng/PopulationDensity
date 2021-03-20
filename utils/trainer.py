@@ -39,9 +39,10 @@ def train_test_model(net, train_data, val_data, config):
 
             val_loss = evaluate(net, val_data, device, metric)
             val_losses.append(val_loss.item())
-            print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f} | Val Loss: {:.5f}".format(
-                epoch + 1, i + 1, train_loss, val_loss
-            ))
+            if (i + 1) % 2 == 0:
+                print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f} | Val Loss: {:.5f}".format(
+                    epoch + 1, i + 1, train_loss, val_loss
+                ))
         scheduler.step()
         test_loss = evaluate(net, val_data, device, metric)
         early_stopping(test_loss, net)
