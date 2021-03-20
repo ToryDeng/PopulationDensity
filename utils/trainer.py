@@ -37,23 +37,20 @@ def train_test_model(net, train_data, val_data, config):
             train_loss.backward()
             optimizer.step()
 
-
             val_loss = evaluate(net, val_data, device, metric)
             val_losses.append(val_loss.item())
             print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f} | Val Loss: {:.5f}".format(
                 epoch + 1, i + 1, train_loss, val_loss
             ))
         scheduler.step()
-        #     early_stopping(val_loss, net)
-        #     if early_stopping.early_stop:
-        #         print("Early stopping")
-        #         # 结束模型训练
-        #         break
-        # if early_stopping.early_stop:
-        #     break
-    # test_loss = evaluate(net, test_data, device, metric)
-    end_time = datetime.now()
-    print("Total Running Time: {}".format(end_time - start_time))
+        test_loss = evaluate(net, val_data, device, metric)
+        early_stopping(test_loss, net)
+        if early_stopping.early_stop:
+            print("Early stopping")
+            # 结束模型训练
+            break
+        end_time = datetime.now()
+        print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
     torch.save(net, 'results/DeepST-ResNet.pkl')
     np.save('results/train_losses.npy', np.array(train_losses))
     np.save('results/val_losses.npy', np.array(val_losses))
@@ -74,9 +71,6 @@ def evaluate(net, data_iter, device, method):
             if isinstance(net, torch.nn.Module):
                 net.eval()
                 y_pred = net(X)
+                y_pred[y_pred < 0] = 0
                 net.train()
                 return method(y_pred, y.to(device)) / y.shape[0]
-
-
-
-

@@ -23,7 +23,7 @@ class Config:
         self.day = 24
         self.week = 24 * 7
         # 神经网络训练相关超参
-        self.epochs = 1
+        self.epochs = 200
         self.batch_size = 32
         self.num_linear_units = 10
         self.init_method = kaiming_normal_

@@ -1,5 +1,6 @@
 from torch import nn
 import torch
+import torch.nn.functional as F
 
 
 class ResNet(nn.Module):
@@ -31,7 +32,7 @@ class ResNet(nn.Module):
         trend_out = self.trend(trend_data).view(-1, self.y, self.x)
         ext_out = self.ext(feature_data)
         ext_out = ext_out.view(-1, self.y, self.x)
-        main_out = torch.tanh(
+        main_out = F.gelu(
             torch.mul(recent_out, self.w1) + torch.mul(period_out, self.w2) + torch.mul(trend_out, self.w3) + ext_out
         )
         return main_out
@@ -46,7 +47,6 @@ class ResPath(nn.Module):
         self.unit = nn.Sequential(
             nn.Conv2d(in_flow, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
             ResUnit(), ResUnit(), ResUnit(), ResUnit(),
-            ResUnit(), ResUnit(), ResUnit(), ResUnit(),
 
             nn.ReLU(inplace=True),
             nn.Conv2d(64, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
@@ -60,7 +60,7 @@ class ResUnit(nn.Module):
     def __init__(self, in_flow=64, out_flow=64):
         super(ResUnit, self).__init__()
         self.left = nn.Sequential(
-            nn.ReLU(inplace=True),
+            nn.GELU(),
             nn.Conv2d(in_flow, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
         )
 
