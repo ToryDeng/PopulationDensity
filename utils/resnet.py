@@ -63,7 +63,7 @@ class ResUnit(nn.Module):
         super(ResUnit, self).__init__()
         self.left = nn.Sequential(
             nn.GELU(),
-            nn.Conv2d(in_flow, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
+            nn.Conv2d(in_flow, out_flow, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0), bias=True),
         )
 
     def forward(self, x):
