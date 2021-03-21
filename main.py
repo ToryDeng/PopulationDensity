@@ -13,7 +13,7 @@ config = Config()
 train_loader, val_loader = train_val_test_loader(config)
 # 定义网络，训练并测试
 net = ResNet(config).to(config.device)
-train_test_model(net, train_loader, val_loader, config)
+# train_test_model(net, train_loader, val_loader, config)
 # 测试baseline
 testLastHourRegression(val_loader, config.device, config.metric, hour_type='last_day')
 testLastHourRegression(val_loader, config.device, config.metric, hour_type='last_week')

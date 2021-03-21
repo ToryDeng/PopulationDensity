@@ -28,8 +28,8 @@ class Config:
         self.num_linear_units = 10
         self.init_method = kaiming_normal_
         self.ext_dim = 13
-        self.learning_rate = 1e-3
+        self.learning_rate = 5e-3
         self.loss_func = MSELoss()
         self.metric = MSELoss(reduction='sum')
         self.optimizer = torch.optim.Adam
-        self.patience = 7
+        self.patience = 15

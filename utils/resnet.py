@@ -33,7 +33,7 @@ class ResNet(nn.Module):
         trend_out = self.trend(trend_data).view(-1, self.y, self.x)
         ext_out = self.ext(feature_data)
         ext_out = ext_out.view(-1, self.y, self.x)
-        main_out = F.gelu(
+        main_out = F.softsign(
             torch.mul(recent_out, self.w1) + torch.mul(period_out, self.w2) +
             torch.mul(trend_out, self.w3) + torch.mul(strength_data, self.w4) + ext_out
         )
@@ -50,7 +50,7 @@ class ResPath(nn.Module):
             nn.Conv2d(in_flow, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
             ResUnit(), ResUnit(), ResUnit(), ResUnit(),
 
-            nn.ReLU(inplace=True),
+            nn.ReLU(),
             nn.Conv2d(64, out_flow, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=True),
         )
 
@@ -62,7 +62,7 @@ class ResUnit(nn.Module):
     def __init__(self, in_flow=64, out_flow=64):
         super(ResUnit, self).__init__()
         self.left = nn.Sequential(
-            nn.GELU(),
+            nn.ReLU(),
             nn.Conv2d(in_flow, out_flow, kernel_size=(1, 1), stride=(1, 1), padding=(0, 0), bias=True),
         )
 
