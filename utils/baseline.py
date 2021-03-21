@@ -38,7 +38,7 @@ def testArima(config):
     err_sum = 0.0
 
     cores = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(processes=cores)
+    pool = multiprocessing.Pool(processes=int(cores / 2))
     for err in pool.imap(onePlaceArima, data):
         print(err)
         err_sum += err

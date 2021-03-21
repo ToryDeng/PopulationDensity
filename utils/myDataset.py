@@ -9,8 +9,8 @@ def toTensor(lst):
 
 class MyDataset(Dataset):
     def __init__(self, config, data_type='train'):
-        self.flow = np.load('data/grid_graph_flow.npy')
-        self.meta = np.load('data/meta_data.npy')
+        self.flow = np.load('data/grid_graph_flow.npy')[8 * 24:, :, :]
+        self.meta = np.load('data/meta_data.npy')[8 * 24:, :]
         self.strength = np.load('data/norm_strength_flow.npy')
         self.min = self.flow.min()
         self.max = self.flow.max()

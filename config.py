@@ -12,12 +12,12 @@ class Config:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.pred_len = 1
         # 训练，验证，测试集划分
-        self.train_size = 0.9
-        self.val_size = 0.1
+        self.train_size = 0.8
+        self.val_size = 0.2
         # self.test_size = 0.1
         # 邻近性因子，周期性因子，趋势性因子长度
-        self.recent_len = 4
-        self.period_len = 3
+        self.recent_len = 3
+        self.period_len = 2
         self.trend_len = 1
         # 偏移量day, week设置
         self.day = 24

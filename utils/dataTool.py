@@ -131,6 +131,12 @@ def plotTrainValLoss():
     plt.savefig('results/train_val_loss_decrease.jpg', dpi=150, bbox_inches='tight')
 
 
+def plotArea(i, j):
+    flow = np.load('data/grid_graph_flow.npy')
+    plt.plot(range(flow.shape[0]-192), flow[192:, i, j])
+    plt.show()
+
+
 def loadModel(config):
     net = ResNet(config)
     net.load_state_dict(torch.load('results/checkpoint.pt'))
