@@ -37,24 +37,21 @@ def train_test_model(net, train_data, val_data, config):
             train_loss.backward()
             optimizer.step()
 
-            val_loss = evaluate(net, val_data, device, metric)
-            val_losses.append(val_loss.item())
             if (i + 1) % 2 == 0:
-                print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f} | Val Loss: {:.5f}".format(
-                    epoch + 1, i + 1, train_loss, val_loss
+                print("Epoch: {:>2d}, Batch: {:>2d} | Training Loss: {:.5f}".format(
+                    epoch + 1, i + 1, train_loss
                 ))
         scheduler.step()
-        test_loss = evaluate(net, val_data, device, metric)
-        early_stopping(test_loss, net)
-        end_time = datetime.now()
-        print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
-        if early_stopping.early_stop:
-            print("Early stopping")
-            # 结束模型训练
-            break
+    test_loss = evaluate(net, val_data, device, metric)
+    # early_stopping(val_loss, net)
+    end_time = datetime.now()
+    print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
+    # if early_stopping.early_stop:
+    #     print("Early stopping")
+    #     # 结束模型训练
+    #     break
     torch.save(net, 'results/DeepST-ResNet.pkl')
     np.save('results/train_losses.npy', np.array(train_losses))
-    np.save('results/val_losses.npy', np.array(val_losses))
 
 
 def evaluate(net, data_iter, device, method):

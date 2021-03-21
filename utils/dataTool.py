@@ -112,13 +112,10 @@ def train_val_test_loader(config):
     myTrainDataset = MyDataset(config=config, data_type='train')
     train_loader = DataLoader(dataset=myTrainDataset, batch_size=config.batch_size, shuffle=False)
 
-    myValDataset = MyDataset(config=config, data_type='val')  # 一次读入
-    val_loader = DataLoader(dataset=myValDataset, batch_size=myValDataset.val_len, shuffle=False)
+    myTestDataset = MyDataset(config=config, data_type='test')  # 一次读入
+    test_loader = DataLoader(dataset=myTestDataset, batch_size=myTestDataset.test_len, shuffle=False)
 
-    # myTestDataset = MyDataset(config=config, data_type='test')  # 一次读入
-    # test_loader = DataLoader(dataset=myTestDataset, batch_size=myTestDataset.test_len, shuffle=False)
-
-    return train_loader, val_loader
+    return train_loader, test_loader
 
 
 def plotTrainValLoss():
