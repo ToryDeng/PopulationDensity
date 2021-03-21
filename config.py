@@ -22,13 +22,12 @@ class Config:
         self.day = 24
         self.week = 24 * 7
         # 神经网络训练相关超参
-        self.epochs = 400
+        self.epochs = 1
         self.batch_size = 32
         self.num_linear_units = 10
         self.init_method = kaiming_normal_
         self.ext_dim = 13
         self.learning_rate = 5e-3
-        self.loss_func = MSELoss()
         self.metric = MSELoss(reduction='sum')
         self.optimizer = torch.optim.Adam
         self.patience = 15

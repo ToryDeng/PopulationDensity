@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+import matplotlib
 from datetime import datetime
 from utils.resnet import ResNet
 from utils.myDataset import MyDataset
@@ -30,6 +31,7 @@ def loadGridStrength():
     strength = np.load('data/grid_strength_flow.npy').swapaxes(1, 2)
     strength = (strength - strength.min()) / (strength.max() - strength.min())
     np.save('data/norm_strength_flow.npy', strength)
+
 
 def loadMigrationIndex():
     migra_data = pd.read_csv('data/migration_index.csv', header=None)
@@ -119,6 +121,7 @@ def train_val_test_loader(config):
 
 
 def plotTrainValLoss():
+    matplotlib.use('Agg')
     plt.style.use("ggplot")
     train_losses = np.load('results/train_losses.npy', allow_pickle=True)
     val_losses = np.load('results/val_losses.npy', allow_pickle=True)

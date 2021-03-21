@@ -5,13 +5,12 @@ import torch
 import numpy as np
 
 
-def train_test_model(net, train_data, val_data, config):
+def train_test_model(net, train_data, test_data, config):
     """
     训练并测试网络，最后保存训练损失与验证损失
 
     :param net: 神经网络
     :param train_data: 训练数据
-    :param val_data: 验证数据
     :param test_data: 测试数据
     :param config: 全局设置文件
     :return: None
@@ -19,7 +18,6 @@ def train_test_model(net, train_data, val_data, config):
     train_losses, val_losses = [], []
     start_time = datetime.now()
     early_stopping = EarlyStopping(patience=config.patience, verbose=False)
-    loss_func = config.loss_func
     metric = config.metric
     device = config.device
     optimizer = config.optimizer(net.parameters(), lr=config.learning_rate)
@@ -42,7 +40,7 @@ def train_test_model(net, train_data, val_data, config):
                     epoch + 1, i + 1, train_loss
                 ))
         scheduler.step()
-    test_loss = evaluate(net, val_data, device, metric)
+    test_loss = evaluate(net, test_data, device, metric)
     # early_stopping(val_loss, net)
     end_time = datetime.now()
     print("Test Loss: {:e} | Total Running Time: {}".format(test_loss, end_time - start_time))
