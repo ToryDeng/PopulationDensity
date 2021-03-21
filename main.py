@@ -17,3 +17,4 @@ train_test_model(net, train_loader, test_loader, config)
 # 测试baseline
 testLastHourRegression(test_loader, config.device, config.metric, hour_type='last_day')
 testLastHourRegression(test_loader, config.device, config.metric, hour_type='last_week')
+testArima(config)
