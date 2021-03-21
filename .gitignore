@@ -3,3 +3,4 @@ data/shortstay_20200201_20200215.csv
 .idea/
 __pycache__/
 venv/
+/data/datafountain_competition_od.txt
