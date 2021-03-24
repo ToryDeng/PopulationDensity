@@ -31,3 +31,5 @@ class Config:
         self.metric = MSELoss(reduction='sum')
         self.optimizer = torch.optim.Adam
         self.patience = 15
+        # baseline
+        self.sample_rate = 0.25  # arima

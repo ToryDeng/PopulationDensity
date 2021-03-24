@@ -34,9 +34,9 @@ def testArima(config):
 
     train_flow, test_flow = flow[:-test_len], flow[-test_len:]
     err_sum = 0.0
-    random_y = np.random.choice(train_flow.shape[1], int(train_flow.shape[1] / 10), replace=False)
-    random_x = np.random.choice(train_flow.shape[2], int(train_flow.shape[2] / 10), replace=False)
+    random_y = np.random.choice(train_flow.shape[1], int(train_flow.shape[1] * config.sample_rate), replace=False)
+    random_x = np.random.choice(train_flow.shape[2], int(train_flow.shape[2] * config.sample_rate), replace=False)
 
     for i, j in product(random_y, random_x):
         err_sum += onePlaceArima(train_flow[:, i, j], test_flow[:, i, j], test_len)
-    print("ARIMA预测MSE：{:e}".format(err_sum / test_len))
+    print("ARIMA预测MSE：{:e}".format(err_sum / (test_len * config.sample_rate)))
