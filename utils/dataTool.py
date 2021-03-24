@@ -3,7 +3,6 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import matplotlib
-from datetime import datetime
 from utils.resnet import ResNet
 from utils.myDataset import MyDataset
 from torch.utils.data import DataLoader
@@ -19,8 +18,10 @@ def convertGridStrength():
     y = np.sort(np.unique(grid_strength['start_grid_y']))
     grid_strength_flow = np.zeros((2, 24, x.shape[0], y.shape[0]))
     for i in tqdm(range(grid_strength.shape[0])):
-        start_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 1]))[0], np.argwhere(np.isin(y, grid_strength.iloc[i, 2]))[0]])
-        end_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 3]))[0], np.argwhere(np.isin(y, grid_strength.iloc[i, 4]))[0]])
+        start_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 1]))[0],
+                                    np.argwhere(np.isin(y, grid_strength.iloc[i, 2]))[0]])
+        end_idx = np.concatenate([np.argwhere(np.isin(x, grid_strength.iloc[i, 3]))[0],
+                                  np.argwhere(np.isin(y, grid_strength.iloc[i, 4]))[0]])
         # start离开-end到达
         grid_strength_flow[0, grid_strength.iloc[i, 0], start_idx[0], start_idx[1]] += grid_strength.iloc[i, 5]
         grid_strength_flow[1, grid_strength.iloc[i, 0], end_idx[0], end_idx[1]] += grid_strength.iloc[i, 5]
@@ -132,9 +133,17 @@ def plotTrainValLoss():
 
 
 def plotArea(i, j):
+    plt.style.use("ggplot")
     flow = np.load('data/grid_graph_flow.npy')
-    plt.plot(range(flow.shape[0]-192), flow[192:, i, j])
+    plt.plot(range(flow.shape[0] - 192), flow[192:, i, j])
     plt.show()
+
+
+def plotResult():
+    plt.style.use("ggplot")
+    result = pd.read_csv('result.csv', index_col=0)
+    result.iloc[:, 0].plot(kind='bar', logy=True, rot=0, ylabel='MSE')
+    plt.savefig('results/results.jpg', dpi=150, bbox_inches='tight')
 
 
 def loadModel(config):

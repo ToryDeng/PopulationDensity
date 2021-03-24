@@ -19,7 +19,7 @@ def testLastHourRegression(test_iter, device, criterion, hour_type):
 
 
 def onePlaceArima(train, test, test_len):
-    model = pm.auto_arima(train, trace=False, suppress_warnings=True)
+    model = pm.auto_arima(train, trace=False, suppress_warnings=True, seasonal=True, m=24, n_jobs=-1)
     pred = model.predict(test_len)
     return np.sum(np.square(test - pred))
 
@@ -34,6 +34,9 @@ def testArima(config):
 
     train_flow, test_flow = flow[:-test_len], flow[-test_len:]
     err_sum = 0.0
-    for i, j in product(range(train_flow.shape[1]), range(train_flow.shape[2])):
+    random_y = np.random.choice(train_flow.shape[1], int(train_flow.shape[1] / 10), replace=False)
+    random_x = np.random.choice(train_flow.shape[2], int(train_flow.shape[2] / 10), replace=False)
+
+    for i, j in product(random_y, random_x):
         err_sum += onePlaceArima(train_flow[:, i, j], test_flow[:, i, j], test_len)
     print("ARIMA预测MSE：{:e}".format(err_sum / test_len))
