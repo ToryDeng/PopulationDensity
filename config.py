@@ -32,4 +32,4 @@ class Config:
         self.optimizer = torch.optim.Adam
         self.patience = 15
         # baseline
-        self.sample_rate = 0.25  # arima
+        self.sample_rate = 0.1  # arima
