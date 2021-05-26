@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from utils.resnet import ResNet
 from utils.myDataset import MyDataset
+from config import Config
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -89,9 +90,11 @@ def convertDataToFlow():
                            dtype={0: np.int32, 1: np.int32, 2: np.float32, 3: np.float32, 4: np.float32})
     stay_data = pd.concat([jan_data, feb_data]).reset_index(drop=True)
     stay_data.columns = ['日期', '小时', '经度', '纬度', '人流量指数']
-    print("经度范围：东经{}°-东经{}°\n纬度范围：北纬{}°-北纬{}°".format(
-        stay_data['经度'].min(), stay_data['经度'].max(), stay_data['纬度'].min(), stay_data['纬度'].max())
+    print("经度范围：东经{}°-东经{}°，共{}列\n纬度范围：北纬{}°-北纬{}°，共{}行".format(
+        stay_data['经度'].min(), stay_data['经度'].max(), stay_data['经度'].unique().shape[0],
+        stay_data['纬度'].min(), stay_data['纬度'].max(), stay_data['纬度'].unique().shape[0])
     )
+    print(stay_data.loc[:, ['经度', '纬度']].drop_duplicates().shape)
     stay_data['经度'] = np.around(stay_data['经度'].values, 2)
     stay_data['纬度'] = np.around(stay_data['纬度'].values, 2)
 
@@ -111,7 +114,7 @@ def convertDataToFlow():
     print("数据转换完成！")
 
 
-def train_val_test_loader(config):
+def train_test_loader(config):
     myTrainDataset = MyDataset(config=config, data_type='train')
     train_loader = DataLoader(dataset=myTrainDataset, batch_size=config.batch_size, shuffle=False)
 
@@ -121,22 +124,21 @@ def train_val_test_loader(config):
     return train_loader, test_loader
 
 
-def plotTrainValLoss():
-    matplotlib.use('Agg')
-    plt.style.use("ggplot")
-    train_losses = np.load('results/train_losses.npy', allow_pickle=True)
-    val_losses = np.load('results/val_losses.npy', allow_pickle=True)
-    concat_losses = np.concatenate([train_losses[:, np.newaxis], val_losses[:, np.newaxis]], axis=1)
-    pd.DataFrame(data=concat_losses, columns=['Train Loss', 'Val Loss']).plot(
-        logy=True, figsize=(10, 6), xlabel='Batch', ylabel='Loss')
-    plt.savefig('results/train_val_loss_decrease.jpg', dpi=150, bbox_inches='tight')
-
-
 def plotArea(i, j):
     plt.style.use("ggplot")
     flow = np.load('data/grid_graph_flow.npy')
-    plt.plot(range(flow.shape[0] - 192), flow[192:, i, j])
-    plt.show()
+    plt.plot(range(flow.shape[0] - 0), flow[0:, i, j])
+    plt.xlabel('Hour')
+    plt.ylabel('Index')
+    plt.savefig('results/area.jpg', dpi=150, bbox_inches='tight')
+
+
+def plotGridGraph(hour):
+    flow = np.load('data/grid_graph_flow.npy')
+    plt.imshow(flow[hour])
+    plt.tight_layout()
+    plt.axis("off")
+    plt.savefig('imgs/' + str(hour) + '.jpg', dpi=150, bbox_inches='tight', pad_inches=0)
 
 
 def plotResult():

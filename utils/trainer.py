@@ -15,7 +15,7 @@ def train_test_model(net, train_data, test_data, config):
     :param config: 全局设置文件
     :return: None
     """
-    train_losses, val_losses = [], []
+    train_losses, test_losses = [], []
     start_time = datetime.now()
     early_stopping = EarlyStopping(patience=config.patience, verbose=False)
     metric = config.metric
